@@ -1,0 +1,14 @@
+machine:
+  services:
+    - docker
+dependencies:
+  cache_directories:
+    - "~/docker-ldap"
+  override:
+    - docker info
+    - if [[ -e ~/docker-ldap/image.tar ]]; then docker load --input ~/docker-ldap/image.tar; fi
+    - docker build -t jpbarto/ldap .
+    - mkdir -p ~/docker-ldap; docker save --output ~/docker-ldap/image.tar jpbarto/ldap
+test:
+  override:
+    - docker run -d -p 172.17.42.1:389:389/tcp jpbarto/ldap; sleep 10
